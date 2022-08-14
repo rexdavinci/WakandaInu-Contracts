@@ -1,204 +1,193 @@
-pragma solidity =0.5.16;
+pragma solidity =0.6.6;
+import "../helpers/IERC20.sol";
+import "../helpers/SafeMath.sol";
 
-interface IWakandaFactory {
-    event PairCreated(
-        address indexed token0,
-        address indexed token1,
-        address pair,
-        uint
-    );
+// interface IWakandaFactory {
+//     event PairCreated(
+//         address indexed token0,
+//         address indexed token1,
+//         address pair,
+//         uint
+//     );
 
-    function feeTo() external view returns (address);
+//     function feeTo() external view returns (address);
 
-    function feeToSetter() external view returns (address);
+//     function feeToSetter() external view returns (address);
 
-    function getPair(address tokenA, address tokenB)
-        external
-        view
-        returns (address pair);
+//     function getPair(address tokenA, address tokenB)
+//         external
+//         view
+//         returns (address pair);
 
-    function allPairs(uint) external view returns (address pair);
+//     function allPairs(uint) external view returns (address pair);
 
-    function allPairsLength() external view returns (uint);
+//     function allPairsLength() external view returns (uint);
 
-    function createPair(address tokenA, address tokenB)
-        external
-        returns (address pair);
+//     function createPair(address tokenA, address tokenB)
+//         external
+//         returns (address pair);
 
-    function setFeeTo(address) external;
+//     function setFeeTo(address) external;
 
-    function setFeeToSetter(address) external;
-}
+//     function setFeeToSetter(address) external;
+// }
 
-interface IWakandaPair {
-    event Approval(address indexed owner, address indexed spender, uint value);
-    event Transfer(address indexed from, address indexed to, uint value);
+// interface IWakandaPair {
+//     event Approval(address indexed owner, address indexed spender, uint value);
+//     event Transfer(address indexed from, address indexed to, uint value);
 
-    function name() external pure returns (string memory);
+//     function name() external pure returns (string memory);
 
-    function symbol() external pure returns (string memory);
+//     function symbol() external pure returns (string memory);
 
-    function decimals() external pure returns (uint8);
+//     function decimals() external pure returns (uint8);
 
-    function totalSupply() external view returns (uint);
+//     function totalSupply() external view returns (uint);
 
-    function balanceOf(address owner) external view returns (uint);
+//     function balanceOf(address owner) external view returns (uint);
 
-    function allowance(address owner, address spender)
-        external
-        view
-        returns (uint);
+//     function allowance(address owner, address spender)
+//         external
+//         view
+//         returns (uint);
 
-    function approve(address spender, uint value) external returns (bool);
+//     function approve(address spender, uint value) external returns (bool);
 
-    function transfer(address to, uint value) external returns (bool);
+//     function transfer(address to, uint value) external returns (bool);
 
-    function transferFrom(
-        address from,
-        address to,
-        uint value
-    ) external returns (bool);
+//     function transferFrom(
+//         address from,
+//         address to,
+//         uint value
+//     ) external returns (bool);
 
-    function DOMAIN_SEPARATOR() external view returns (bytes32);
+//     function DOMAIN_SEPARATOR() external view returns (bytes32);
 
-    function PERMIT_TYPEHASH() external pure returns (bytes32);
+//     function PERMIT_TYPEHASH() external pure returns (bytes32);
 
-    function nonces(address owner) external view returns (uint);
+//     function nonces(address owner) external view returns (uint);
 
-    function permit(
-        address owner,
-        address spender,
-        uint value,
-        uint deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external;
+//     function permit(
+//         address owner,
+//         address spender,
+//         uint value,
+//         uint deadline,
+//         uint8 v,
+//         bytes32 r,
+//         bytes32 s
+//     ) external;
 
-    event Mint(address indexed sender, uint amount0, uint amount1);
-    event Burn(
-        address indexed sender,
-        uint amount0,
-        uint amount1,
-        address indexed to
-    );
-    event Swap(
-        address indexed sender,
-        uint amount0In,
-        uint amount1In,
-        uint amount0Out,
-        uint amount1Out,
-        address indexed to
-    );
-    event Sync(uint112 reserve0, uint112 reserve1);
+//     event Mint(address indexed sender, uint amount0, uint amount1);
+//     event Burn(
+//         address indexed sender,
+//         uint amount0,
+//         uint amount1,
+//         address indexed to
+//     );
+//     event Swap(
+//         address indexed sender,
+//         uint amount0In,
+//         uint amount1In,
+//         uint amount0Out,
+//         uint amount1Out,
+//         address indexed to
+//     );
+//     event Sync(uint112 reserve0, uint112 reserve1);
 
-    function MINIMUM_LIQUIDITY() external pure returns (uint);
+//     function MINIMUM_LIQUIDITY() external pure returns (uint);
 
-    function factory() external view returns (address);
+//     function factory() external view returns (address);
 
-    function token0() external view returns (address);
+//     function token0() external view returns (address);
 
-    function token1() external view returns (address);
+//     function token1() external view returns (address);
 
-    function getReserves()
-        external
-        view
-        returns (
-            uint112 reserve0,
-            uint112 reserve1,
-            uint32 blockTimestampLast
-        );
+//     function getReserves()
+//         external
+//         view
+//         returns (
+//             uint112 reserve0,
+//             uint112 reserve1,
+//             uint32 blockTimestampLast
+//         );
 
-    function price0CumulativeLast() external view returns (uint);
+//     function price0CumulativeLast() external view returns (uint);
 
-    function price1CumulativeLast() external view returns (uint);
+//     function price1CumulativeLast() external view returns (uint);
 
-    function kLast() external view returns (uint);
+//     function kLast() external view returns (uint);
 
-    function mint(address to) external returns (uint liquidity);
+//     function mint(address to) external returns (uint liquidity);
 
-    function burn(address to) external returns (uint amount0, uint amount1);
+//     function burn(address to) external returns (uint amount0, uint amount1);
 
-    function swap(
-        uint amount0Out,
-        uint amount1Out,
-        address to,
-        bytes calldata data
-    ) external;
+//     function swap(
+//         uint amount0Out,
+//         uint amount1Out,
+//         address to,
+//         bytes calldata data
+//     ) external;
 
-    function skim(address to) external;
+//     function skim(address to) external;
 
-    function sync() external;
+//     function sync() external;
 
-    function initialize(address, address) external;
-}
+//     function initialize(address, address) external;
+// }
 
-interface IWKDLP {
-    event Approval(address indexed owner, address indexed spender, uint value);
-    event Transfer(address indexed from, address indexed to, uint value);
+// interface IWKDLP {
+//     event Approval(address indexed owner, address indexed spender, uint value);
+//     event Transfer(address indexed from, address indexed to, uint value);
 
-    function name() external pure returns (string memory);
+//     function name() external pure returns (string memory);
 
-    function symbol() external pure returns (string memory);
+//     function symbol() external pure returns (string memory);
 
-    function decimals() external pure returns (uint8);
+//     function decimals() external pure returns (uint8);
 
-    function totalSupply() external view returns (uint);
+//     function totalSupply() external view returns (uint);
 
-    function balanceOf(address owner) external view returns (uint);
+//     function balanceOf(address owner) external view returns (uint);
 
-    function allowance(address owner, address spender)
-        external
-        view
-        returns (uint);
+//     function allowance(address owner, address spender)
+//         external
+//         view
+//         returns (uint);
 
-    function approve(address spender, uint value) external returns (bool);
+//     function approve(address spender, uint value) external returns (bool);
 
-    function transfer(address to, uint value) external returns (bool);
+//     function transfer(address to, uint value) external returns (bool);
 
-    function transferFrom(
-        address from,
-        address to,
-        uint value
-    ) external returns (bool);
+//     function transferFrom(
+//         address from,
+//         address to,
+//         uint value
+//     ) external returns (bool);
 
-    function DOMAIN_SEPARATOR() external view returns (bytes32);
+//     function DOMAIN_SEPARATOR() external view returns (bytes32);
 
-    function PERMIT_TYPEHASH() external pure returns (bytes32);
+//     function PERMIT_TYPEHASH() external pure returns (bytes32);
 
-    function nonces(address owner) external view returns (uint);
+//     function nonces(address owner) external view returns (uint);
 
-    function permit(
-        address owner,
-        address spender,
-        uint value,
-        uint deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external;
-}
+//     function permit(
+//         address owner,
+//         address spender,
+//         uint value,
+//         uint deadline,
+//         uint8 v,
+//         bytes32 r,
+//         bytes32 s
+//     ) external;
+// }
 
 // a library for performing overflow-safe math, courtesy of DappHub (https://github.com/dapphub/ds-math)
-library SafeMath {
-    function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "ds-math-add-overflow");
-    }
 
-    function sub(uint x, uint y) internal pure returns (uint z) {
-        require((z = x - y) <= x, "ds-math-sub-underflow");
-    }
-
-    function mul(uint x, uint y) internal pure returns (uint z) {
-        require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
-    }
-}
-
-contract WKDLP is IWKDLP {
+contract WKDLP {
     using SafeMath for uint;
 
-    string public constant name = "Droplet LPs";
-    string public constant symbol = "Droplet-LP";
+    string public constant name = "Wakanda LP";
+    string public constant symbol = "WKDLP";
     uint8 public constant decimals = 18;
     uint public totalSupply;
     mapping(address => uint) public balanceOf;
@@ -216,7 +205,7 @@ contract WKDLP is IWKDLP {
     constructor() public {
         uint chainId;
         assembly {
-            chainId := chainid
+            chainId := chainid()
         }
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
@@ -359,36 +348,6 @@ library UQ112x112 {
     }
 }
 
-interface IERC20 {
-    event Approval(address indexed owner, address indexed spender, uint value);
-    event Transfer(address indexed from, address indexed to, uint value);
-
-    function name() external view returns (string memory);
-
-    function symbol() external view returns (string memory);
-
-    function decimals() external view returns (uint8);
-
-    function totalSupply() external view returns (uint);
-
-    function balanceOf(address owner) external view returns (uint);
-
-    function allowance(address owner, address spender)
-        external
-        view
-        returns (uint);
-
-    function approve(address spender, uint value) external returns (bool);
-
-    function transfer(address to, uint value) external returns (bool);
-
-    function transferFrom(
-        address from,
-        address to,
-        uint value
-    ) external returns (bool);
-}
-
 interface IWakandaCallee {
     function wakandaCall(
         address sender,
@@ -398,7 +357,7 @@ interface IWakandaCallee {
     ) external;
 }
 
-contract WakandaPair is IWakandaPair, WKDLP {
+contract WakandaPair is WKDLP {
     using SafeMath for uint;
     using UQ112x112 for uint224;
 
@@ -515,7 +474,7 @@ contract WakandaPair is IWakandaPair, WKDLP {
         private
         returns (bool feeOn)
     {
-        address feeTo = IWakandaFactory(factory).feeTo();
+        address feeTo = WakandaFactory(factory).feeTo();
         feeOn = feeTo != address(0);
         uint _kLast = kLast; // gas savings
         if (feeOn) {
@@ -681,7 +640,7 @@ contract WakandaPair is IWakandaPair, WKDLP {
     }
 }
 
-contract WakandaFactory is IWakandaFactory {
+contract WakandaFactory {
     bytes32 public constant INIT_CODE_PAIR_HASH =
         keccak256(abi.encodePacked(type(WakandaPair).creationCode));
 
@@ -721,7 +680,7 @@ contract WakandaFactory is IWakandaFactory {
         assembly {
             pair := create2(0, add(bytecode, 32), mload(bytecode), salt)
         }
-        IWakandaPair(pair).initialize(token0, token1);
+        WakandaPair(pair).initialize(token0, token1);
         getPair[token0][token1] = pair;
         getPair[token1][token0] = pair; // populate mapping in the reverse direction
         allPairs.push(pair);

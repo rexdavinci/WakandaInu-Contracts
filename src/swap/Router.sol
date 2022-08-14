@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity =0.6.6;
+import "../helpers/IERC20.sol";
 
 interface IWakandaFactory {
     event PairCreated(
@@ -438,7 +439,7 @@ library WakandaLibrary {
                         hex"ff",
                         factory,
                         keccak256(abi.encodePacked(token0, token1)),
-                        hex"479923081fe484eca24d24f3d5ba5c38e1de0c5cef09461c41edfa05c0005542" // init code hash
+                        hex"b9b4b0107fc0e11dd5d1efbcabfcc059ab12d0ab7d380ea56208bff5e63190e6" // init code hash
                     )
                 )
             )
@@ -545,36 +546,6 @@ library WakandaLibrary {
             amounts[i - 1] = getAmountIn(amounts[i], reserveIn, reserveOut);
         }
     }
-}
-
-interface IERC20 {
-    event Approval(address indexed owner, address indexed spender, uint value);
-    event Transfer(address indexed from, address indexed to, uint value);
-
-    function name() external view returns (string memory);
-
-    function symbol() external view returns (string memory);
-
-    function decimals() external view returns (uint8);
-
-    function totalSupply() external view returns (uint);
-
-    function balanceOf(address owner) external view returns (uint);
-
-    function allowance(address owner, address spender)
-        external
-        view
-        returns (uint);
-
-    function approve(address spender, uint value) external returns (bool);
-
-    function transfer(address to, uint value) external returns (bool);
-
-    function transferFrom(
-        address from,
-        address to,
-        uint value
-    ) external returns (bool);
 }
 
 interface IWETH {

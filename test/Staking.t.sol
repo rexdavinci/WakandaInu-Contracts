@@ -8,7 +8,7 @@ import "../src/helpers/MOCKRWD.sol";
 import "../src/helpers/MockWKD.sol";
 import "../src/helpers/IBEP20.sol";
 
-contract ContractTest is Test {
+contract StakingTest is Test {
     GenericStakeFactory sFactory;
     MockREWARD mREWARD;
     MOCKWAKANDA mWAKANDA;
