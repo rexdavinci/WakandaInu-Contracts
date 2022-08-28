@@ -439,7 +439,7 @@ library WakandaLibrary {
                         hex"ff",
                         factory,
                         keccak256(abi.encodePacked(token0, token1)),
-                        hex"b9b4b0107fc0e11dd5d1efbcabfcc059ab12d0ab7d380ea56208bff5e63190e6" // init code hash
+                        hex"075ae7bf9b35990cb85e2b4fab6e1f3c887cbc2d33db655fc4c74a7aa19d21f7" // init code hash
                     )
                 )
             )

@@ -6,6 +6,6 @@ contract MockREWARD is ERC20("REWARD TOKEN", "RWD") {
     constructor() public {}
 
     function setAddress(address _genericStake) public {
-        _mint(_genericStake, 10000e18);
+        _mint(_genericStake, 100000000000e18);
     }
 }
