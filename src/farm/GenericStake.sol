@@ -25,6 +25,7 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
 
     // Accrued token per share
     uint256 public accTokenPerShare;
+    uint256 stakedByUsers;
 
     // The block number when WKD mining ends.
     uint256 public bonusEndBlock;
@@ -132,6 +133,7 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
                 "User amount above limit"
             );
         }
+        stakedByUsers += _amount;
 
         _updatePool();
 
@@ -169,6 +171,7 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
     function withdraw(uint256 _amount) external nonReentrant {
         UserInfo storage user = userInfo[msg.sender];
         require(user.amount >= _amount, "Amount to withdraw too high");
+        stakedByUsers -= _amount;
 
         _updatePool();
 
@@ -192,6 +195,10 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
         );
 
         emit Withdraw(msg.sender, _amount);
+    }
+
+    function availableRewards() public view returns (uint) {
+        return stakedToken.balanceOf(address(this)) - stakedByUsers;
     }
 
     /*
@@ -322,7 +329,7 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
      */
     function pendingReward(address _user) external view returns (uint256) {
         UserInfo storage user = userInfo[_user];
-        uint256 stakedTokenSupply = stakedToken.balanceOf(address(this));
+        uint256 stakedTokenSupply = stakedByUsers;
         if (block.number > lastRewardBlock && stakedTokenSupply != 0) {
             uint256 multiplier = _getMultiplier(lastRewardBlock, block.number);
             uint256 wakandaReward = multiplier.mul(rewardPerBlock);
@@ -351,7 +358,7 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
             return;
         }
 
-        uint256 stakedTokenSupply = stakedToken.balanceOf(address(this));
+        uint256 stakedTokenSupply = stakedByUsers;
 
         if (stakedTokenSupply == 0) {
             lastRewardBlock = block.number;

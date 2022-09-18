@@ -7,7 +7,8 @@ import "../helpers/IBEP20.sol";
 import "./GenericStake.sol";
 
 contract GenericStakeFactory is Ownable {
-    event NewGenericPool(address indexed smartChef);
+    event NewGenericPool(address indexed newPool);
+    bool wkdInit;
 
     constructor() public {
         //
@@ -35,8 +36,10 @@ contract GenericStakeFactory is Ownable {
     ) external onlyOwner returns (address) {
         require(_stakedToken.totalSupply() >= 0);
         require(_rewardToken.totalSupply() >= 0);
-        require(_stakedToken != _rewardToken, "Tokens must be be different");
-
+        if (_stakedToken == _rewardToken) {
+            assert(!wkdInit);
+            wkdInit = true;
+        }
         bytes memory bytecode = type(WakandaPoolInitializable).creationCode;
         bytes32 salt = keccak256(
             abi.encodePacked(_stakedToken, _rewardToken, _startBlock)
