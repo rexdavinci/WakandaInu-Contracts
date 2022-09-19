@@ -25,7 +25,7 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
 
     // Accrued token per share
     uint256 public accTokenPerShare;
-    uint256 stakedByUsers;
+    uint256 public stakedByUsers;
 
     // The block number when WKD mining ends.
     uint256 public bonusEndBlock;
@@ -213,6 +213,7 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
 
         if (amountToTransfer > 0) {
             stakedToken.safeTransfer(address(msg.sender), amountToTransfer);
+            stakedByUsers -= amountToTransfer;
         }
 
         emit EmergencyWithdraw(msg.sender, user.amount);
@@ -223,6 +224,7 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
      * @dev Only callable by owner. Needs to be for emergency.
      */
     function emergencyRewardWithdraw(uint256 _amount) external onlyOwner {
+        require(_amount <= availableRewards());
         rewardToken.safeTransfer(address(msg.sender), _amount);
     }
 
@@ -239,10 +241,6 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
         require(
             _tokenAddress != address(stakedToken),
             "Cannot be staked token"
-        );
-        require(
-            _tokenAddress != address(rewardToken),
-            "Cannot be reward token"
         );
 
         IBEP20(_tokenAddress).safeTransfer(address(msg.sender), _tokenAmount);
