@@ -35,7 +35,6 @@ contract GenericStakeFactory is Ownable {
         address _admin
     ) external onlyOwner returns (address) {
         require(_stakedToken.totalSupply() >= 0);
-        require(_rewardToken.totalSupply() >= 0);
         if (_stakedToken == _rewardToken) {
             assert(!wkdInit);
             wkdInit = true;

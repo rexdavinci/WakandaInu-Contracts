@@ -288,6 +288,12 @@ contract WKDLPPool is Ownable, ReentrancyGuard {
         }
     }
 
+    //Allows the admin the set how many wkd is given out per block
+    //It must be in the form (noOfTokens*1e9)
+    function updateWKDPERBLOCK(uint256 _newRate) public onlyOwner {
+        WKD_PER_BLOCK = _newRate;
+    }
+
     /// @notice Update reward variables for the given pool.
     /// @param _pid The id of the pool. See `poolInfo`.
     /// @return pool Returns the pool that was updated.
@@ -542,6 +548,8 @@ contract WKDLPPool is Ownable, ReentrancyGuard {
     }
 
     function emergencyRescue(uint256 _amount, address _token) public onlyOwner {
+        //owner can only withdraw WKD reward tokens
+        assert(_token == address(WKD));
         IBEP20(_token).transfer(msg.sender, _amount);
     }
 
@@ -552,10 +560,6 @@ contract WKDLPPool is Ownable, ReentrancyGuard {
         if (_amount > 0) {
             if (WKD.balanceOf(address(this)) < _amount) {
                 revert("Not enough WKD for rewards");
-            }
-            uint256 balance = WKD.balanceOf(address(this));
-            if (balance < _amount) {
-                _amount = balance;
             }
             WKD.safeTransfer(_to, _amount);
         }
