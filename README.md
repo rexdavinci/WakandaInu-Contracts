@@ -1,18 +1,22 @@
 # Contract Addresses
 
-## Mainnet
+## Mainnet(Final)
 
-### [Wakanda LP Farm Contract](https://bscscan.com/address/0x23459ca18ca4323356a2ac9c4d8297417798757a)
+//used for creating new pools for lp tokens like wkd-bnb
+### [Wakanda LP Farm Contract](https://bscscan.com/address/0x24c2a03C96E3Fb67D4eA13B802cFe5a122A86843)
 
 [Source](./src/farm/WKLDLPPool.sol)
 
-### [Wakanda Staking Pool Factory](https://bscscan.com/address/0xb2240dfcba543244b018ef9f22dee8ae7cac4dd7#code)
-[Source](./src/farm/GenericStakeFactory.sol)
+//used for creating staking pools for other tokens
+### [General Staking Pool Factory](https://bscscan.com/address/0xcd7e124aa13fe4adc38bc291b8e7b6d15f4b5bd5#code)
+[Source](./src/farms/GeneralPoolFactory.sol)
 
-
-### [WKD-WKD Pool](https://bscscan.com/address/0x6141490c9540BbbF17f3eC79990Bbf9da30Ba57F)
+//single pool used for staking and earning wakanda
+### [WKD-WKD Single Staking Pool](https://bscscan.com/address/0xb0c95c9AeC13ba330bA9f85177673eD03C05A9Cc)
 [Source](./src/farm/GenericStake.sol)
-
+ pool used for staking and earning wakanda
+### [WKD-WKD Single Staking Pool](https://bscscan.com/address/0xb0c95c9AeC13ba330bA9f85177673eD03C05A9Cc)
+[Source](./src/farm/GenericStake.sol)
 ## Testnet
 
 ### [Router Contract](https://testnet.bscscan.com/address/0xd97ECf01cd2C2f7F38999f2585483bb3A09139eF)

@@ -60,7 +60,7 @@ contract GStakingTest is Test {
 
         vm.startPrank(user3);
         mWAKANDA.get();
-        mWAKANDA.approve(newPool, depositValue);
+        mWAKANDA.approve(newPool, 1000000000e18);
         gStake.deposit(depositValue);
         vm.stopPrank();
 
@@ -91,6 +91,9 @@ contract GStakingTest is Test {
         console.log(balanceBefore);
         console.log(totalRewardsOut);
         assertEq(balanceAfter, balanceBefore - totalRewardsOut);
+        gStake.availableRewards();
+        vm.prank(user3);
+        gStake.deposit(100e9);
         gStake.availableRewards();
     }
 

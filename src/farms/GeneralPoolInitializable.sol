@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
-
-pragma solidity ^0.6.0;
+pragma solidity 0.6.12;
 
 import "@openzeppelin/access/Ownable.sol";
 //import "../helpers/SafeMath.sol";
@@ -10,12 +9,12 @@ import "@openzeppelin/utils/ReentrancyGuard.sol";
 import "../helpers/IBEP20.sol";
 import "../helpers/SafeBEP20.sol";
 
-contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
+contract GeneralPoolInializable is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeBEP20 for IBEP20;
 
-    // The address of the Generic Stake factory
-    address public GenericStakeFactory;
+    //address of the pool factory
+    address GeneralPoolFactory;
 
     // Whether a limit is set for users
     bool public hasUserLimit;
@@ -25,12 +24,11 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
 
     // Accrued token per share
     uint256 public accTokenPerShare;
-    uint256 public stakedByUsers;
 
-    // The block number when WKD mining ends.
+    // The block number when WKD reward ends.
     uint256 public bonusEndBlock;
 
-    // The block number when WKD mining starts.
+    // The block number when WKD rewards starts.
     uint256 public startBlock;
 
     // The block number of the last pool update
@@ -39,7 +37,7 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
     // The pool limit (0 if none)
     uint256 public poolLimitPerUser;
 
-    // WKD tokens created per block.
+    // WKD tokens given out per block.
     uint256 public rewardPerBlock;
 
     // The precision factor
@@ -69,7 +67,7 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
     event Withdraw(address indexed user, uint256 amount);
 
     constructor() public {
-        GenericStakeFactory = msg.sender;
+        GeneralPoolFactory = msg.sender;
     }
 
     /*
@@ -92,13 +90,17 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
         address _admin
     ) external {
         require(!isInitialized, "Already initialized");
-        require(msg.sender == GenericStakeFactory, "Not factory");
+        require(msg.sender == GeneralPoolFactory, "Not factory");
 
         // Make this contract initialized
         isInitialized = true;
 
         stakedToken = _stakedToken;
         rewardToken = _rewardToken;
+        require(
+            address(_stakedToken) != address(_rewardToken),
+            "Staked token cannot be the same as reward token"
+        );
         rewardPerBlock = _rewardPerBlock;
         startBlock = _startBlock;
         bonusEndBlock = _bonusEndBlock;
@@ -133,7 +135,6 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
                 "User amount above limit"
             );
         }
-        stakedByUsers += _amount;
 
         _updatePool();
 
@@ -171,7 +172,6 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
     function withdraw(uint256 _amount) external nonReentrant {
         UserInfo storage user = userInfo[msg.sender];
         require(user.amount >= _amount, "Amount to withdraw too high");
-        stakedByUsers -= _amount;
 
         _updatePool();
 
@@ -197,10 +197,6 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
         emit Withdraw(msg.sender, _amount);
     }
 
-    function availableRewards() public view returns (uint) {
-        return stakedToken.balanceOf(address(this)) - stakedByUsers;
-    }
-
     /*
      * @notice Withdraw staked tokens without caring about rewards rewards
      * @dev Needs to be for emergency.
@@ -213,7 +209,6 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
 
         if (amountToTransfer > 0) {
             stakedToken.safeTransfer(address(msg.sender), amountToTransfer);
-            stakedByUsers -= amountToTransfer;
         }
 
         emit EmergencyWithdraw(msg.sender, user.amount);
@@ -224,7 +219,6 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
      * @dev Only callable by owner. Needs to be for emergency.
      */
     function emergencyRewardWithdraw(uint256 _amount) external onlyOwner {
-        require(_amount <= availableRewards());
         rewardToken.safeTransfer(address(msg.sender), _amount);
     }
 
@@ -241,6 +235,10 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
         require(
             _tokenAddress != address(stakedToken),
             "Cannot be staked token"
+        );
+        require(
+            _tokenAddress != address(rewardToken),
+            "Cannot be reward token"
         );
 
         IBEP20(_tokenAddress).safeTransfer(address(msg.sender), _tokenAmount);
@@ -286,6 +284,7 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
      * @param _rewardPerBlock: the reward per block
      */
     function updateRewardPerBlock(uint256 _rewardPerBlock) external onlyOwner {
+        require(block.number < startBlock, "Pool has started");
         rewardPerBlock = _rewardPerBlock;
         emit NewRewardPerBlock(_rewardPerBlock);
     }
@@ -326,12 +325,12 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
      */
     function pendingReward(address _user) external view returns (uint256) {
         UserInfo storage user = userInfo[_user];
-        uint256 stakedTokenSupply = stakedByUsers;
+        uint256 stakedTokenSupply = stakedToken.balanceOf(address(this));
         if (block.number > lastRewardBlock && stakedTokenSupply != 0) {
             uint256 multiplier = _getMultiplier(lastRewardBlock, block.number);
-            uint256 wakandaReward = multiplier.mul(rewardPerBlock);
+            uint256 wkdReward = multiplier.mul(rewardPerBlock);
             uint256 adjustedTokenPerShare = accTokenPerShare.add(
-                wakandaReward.mul(PRECISION_FACTOR).div(stakedTokenSupply)
+                wkdReward.mul(PRECISION_FACTOR).div(stakedTokenSupply)
             );
             return
                 user
@@ -355,7 +354,7 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
             return;
         }
 
-        uint256 stakedTokenSupply = stakedByUsers;
+        uint256 stakedTokenSupply = stakedToken.balanceOf(address(this));
 
         if (stakedTokenSupply == 0) {
             lastRewardBlock = block.number;
@@ -363,9 +362,9 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
         }
 
         uint256 multiplier = _getMultiplier(lastRewardBlock, block.number);
-        uint256 wakandaReward = multiplier.mul(rewardPerBlock);
+        uint256 wkdReward = multiplier.mul(rewardPerBlock);
         accTokenPerShare = accTokenPerShare.add(
-            wakandaReward.mul(PRECISION_FACTOR).div(stakedTokenSupply)
+            wkdReward.mul(PRECISION_FACTOR).div(stakedTokenSupply)
         );
         lastRewardBlock = block.number;
     }
@@ -387,9 +386,5 @@ contract WakandaPoolInitializable is Ownable, ReentrancyGuard {
         } else {
             return bonusEndBlock.sub(_from);
         }
-    }
-
-    function totalWKDStaked() public view returns (uint) {
-        return stakedByUsers;
     }
 }
