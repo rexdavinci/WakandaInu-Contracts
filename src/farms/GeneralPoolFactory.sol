@@ -4,11 +4,10 @@ pragma solidity 0.6.12;
 import "@openzeppelin/access/Ownable.sol";
 import "../helpers/IBEP20.sol";
 
-import "./GenericStake.sol";
+import "./GeneralPoolInitializable.sol";
 
-contract GenericStakeFactory is Ownable {
-    event NewGenericPool(address indexed newPool);
-    bool wkdInit;
+contract GeneralPoolFactory is Ownable {
+    event NewWakandaPoolContract(address indexed tokenPool);
 
     constructor() public {
         //
@@ -33,23 +32,22 @@ contract GenericStakeFactory is Ownable {
         uint256 _bonusEndBlock,
         uint256 _poolLimitPerUser,
         address _admin
-    ) external onlyOwner returns (address) {
+    ) external onlyOwner {
         require(_stakedToken.totalSupply() >= 0);
-        if (_stakedToken == _rewardToken) {
-            assert(!wkdInit);
-            wkdInit = true;
-        }
-        bytes memory bytecode = type(WakandaPoolInitializable).creationCode;
+        require(_rewardToken.totalSupply() >= 0);
+        require(_stakedToken != _rewardToken, "Tokens must be be different");
+
+        bytes memory bytecode = type(GeneralPoolInializable).creationCode;
         bytes32 salt = keccak256(
             abi.encodePacked(_stakedToken, _rewardToken, _startBlock)
         );
-        address genericStake;
+        address poolAddress;
 
         assembly {
-            genericStake := create2(0, add(bytecode, 32), mload(bytecode), salt)
+            poolAddress := create2(0, add(bytecode, 32), mload(bytecode), salt)
         }
 
-        WakandaPoolInitializable(genericStake).initialize(
+        GeneralPoolInializable(poolAddress).initialize(
             _stakedToken,
             _rewardToken,
             _rewardPerBlock,
@@ -59,11 +57,6 @@ contract GenericStakeFactory is Ownable {
             _admin
         );
 
-        emit NewGenericPool(genericStake);
-        return genericStake;
-    }
-
-    function wkdInitialized() external view returns (bool) {
-        return wkdInit;
+        emit NewWakandaPoolContract(poolAddress);
     }
 }
