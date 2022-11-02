@@ -16,7 +16,7 @@
 
  deploy-swap:
 	@echo Deploying Swap Contracts to mainnet
-	@forge script script/Staking.s.sol:StakeDeployment --rpc-url <> --private-key <> --broadcast --verify --etherscan-api-key <> -vvvvv
+	@forge script script/Swap.s.sol:SwapDeployment --rpc-url <> --private-key <> --broadcast --verify --etherscan-api-key <> -vvvvv
 
  deploy-pool:
 	@echo Deploying to Mainnet
