@@ -9,7 +9,8 @@ import "forge-std/Script.sol";
 contract SwapDeployment is Script {
     WakandaFactory wkFactory;
     WakandaRouter wkRouter;
-    address WBNB = 0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd;
+    address WBNB = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
+    address FEETO=0x84a71d3375F811e3c3D899135Ae188D98Eccd924;
 
     function setUp() public {}
 

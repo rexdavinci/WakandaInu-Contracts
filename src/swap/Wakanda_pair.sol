@@ -657,8 +657,8 @@ contract WakandaFactory {
         uint
     );
 
-    constructor() public {
-        feeToSetter = msg.sender;
+    constructor(address _feeTo) public {
+        feeToSetter = _feeTo;
     }
 
     function allPairsLength() external view returns (uint) {
