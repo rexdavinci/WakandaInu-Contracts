@@ -16,7 +16,7 @@ contract SwapDeployment is Script {
 
     function run() public {
         vm.broadcast();
-        wkFactory = new WakandaFactory();
+        wkFactory = new WakandaFactory(FEETO);
         vm.stopBroadcast();
         vm.broadcast();
         wkRouter = new WakandaRouter(address(wkFactory), WBNB);

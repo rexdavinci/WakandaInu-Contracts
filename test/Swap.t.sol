@@ -28,7 +28,9 @@ contract SwapTest is Test {
         weth = new WETH9();
         mREWARD.setAddress(address(this));
         //deploy router and factory
-        wFactory = new WakandaFactory();
+        address FEETO=0x84a71d3375F811e3c3D899135Ae188D98Eccd924;
+
+        wFactory = new WakandaFactory(FEETO);
         wRouter = new WakandaRouter(address(wFactory), address(weth));
         mREWARD.approve(address(wRouter), 1000000e18);
         mWAKANDA.approve(address(wRouter), 1000000e18);
