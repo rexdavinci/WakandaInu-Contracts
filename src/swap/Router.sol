@@ -439,10 +439,9 @@ library WakandaLibrary {
                         hex"ff",
                         factory,
                         keccak256(abi.encodePacked(token0, token1)),
-                        hex"95cd2694b3a3606690c1337390212a3b402d01db466dbf3fbe3d1f8442db9626" // init code hash
+                        hex"cf967570e4f5dd8a0dc592c7642537d79254839f8f2411bb14f5bd5c2e560bda" // init code hash
                     )
                 )
-                
             )
         );
     }
